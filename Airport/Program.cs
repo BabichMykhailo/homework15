@@ -20,8 +20,9 @@ namespace AirportFlight
                 FlightTime = DateTime.UtcNow
 
             };
-            controller.CreateAirportRequest(model);
-            var abc = controller.GetAirportByIdRequest(-1);
+            var a = controller.CreateAirportRequest(model);
+            var ab = controller.GetAll();
+           
         }
     }
 }

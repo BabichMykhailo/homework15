@@ -24,7 +24,7 @@ namespace Airoport.Controllers
             });
             _mapper = new Mapper(mapperConfig);
         }
-        public void CreateAirportRequest(AirportPostModel model)
+        public AirportViewModel CreateAirportRequest(AirportPostModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Flight))
             {
@@ -35,7 +35,9 @@ namespace Airoport.Controllers
                 throw new Exception("Invalid number of flight");
             }
             var airportModel = _mapper.Map<AirportModel>(model);
-            _airportService.CreateAirport(airportModel);
+            
+            var CreatedAirport = _airportService.CreateAirport(airportModel);
+            return _mapper.Map<AirportViewModel>(CreatedAirport);
         }
 
         public AirportViewModel GetAirportByIdRequest(int id)
@@ -46,6 +48,14 @@ namespace Airoport.Controllers
             }
             var airportModel = _airportService.GetAirportById(id);
             var result = _mapper.Map<AirportViewModel>(airportModel);
+            return result;
+        }
+
+        public IEnumerable <AirportViewModel> GetAll()
+        {
+            var allAirports = _airportService.GetAll();
+            var result = _mapper.Map<IEnumerable<AirportViewModel>>(allAirports);
+
             return result;
         }
     }

@@ -1,5 +1,7 @@
 ﻿using AirportFlight.Data.Models;
 using AirportFlight.Data.Repositories;
+using AirportFlights.Data.Interfaces;
+using AirportFlights.Data.Repositories;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -12,12 +14,12 @@ namespace AirportFlight.Domain.Services
     public class AirportService
     {
         
-        private readonly AirportRepository _airportRepository;
+        private readonly IAirportRepository _airportRepository;
         private readonly IMapper _mapper;
         public AirportService()
         {
             
-            _airportRepository = new AirportRepository();
+            _airportRepository = new AirportDapperRepository();
             var mapperConfig = new MapperConfiguration(cfg=>
             {
                 cfg.CreateMap<AirportModel, Airport>().ReverseMap();
@@ -25,21 +27,32 @@ namespace AirportFlight.Domain.Services
             });
             _mapper = new Mapper(mapperConfig);
         }
-        public void CreateAirport(AirportModel model)
+        public AirportModel CreateAirport(AirportModel model)
         {
-            if(_airportRepository.Capacity >= 10)
+            if(_airportRepository.IsFull())
             {
                 throw new Exception("Maximum capacity");
             }
             var airport = _mapper.Map<Airport>(model);
-            _airportRepository.Create(airport);
-            
+            var CreatedAirport = _airportRepository.Create(airport);
+            return _mapper.Map<AirportModel>(CreatedAirport);
         }
+
+
         public AirportModel GetAirportById(int id)
         {
             var airport = _airportRepository.GetById(id);
             var result = _mapper.Map<AirportModel>(airport);
             return result;
-        } 
+        }
+        
+        public IEnumerable<AirportModel> GetAll()
+        {
+            var allAirports = _airportRepository.GetAll();
+            var result = _mapper.Map<IEnumerable<AirportModel>>(allAirports);
+
+            return result;
+        }
+
     }
 }
